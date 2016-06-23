@@ -1,6 +1,5 @@
 
 # Repack middleware
-## Reac, with webpack middleware and hot module replacement
 Simplify installatin of webpack-middleware with hot module replacement in an express-like application,
 if using React, it will also add a res.renderReact(component, vars) to generate react html on the server
 that can be used to iplement isomorphic react.
