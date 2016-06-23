@@ -1,0 +1,25 @@
+{
+  "name": "repack-middleware",
+  "version": "0.1.2",
+  "description": "Express-like middleware to render react views in sails.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react",
+    "webpack",
+    "sails"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "babel-register": "^6.9.0",
+    "lodash": "^4.13.1",
+    "react": "^15.1.0",
+    "react-dom": "^15.1.0",
+    "webpack": "^1.13.1",
+    "webpack-dev-middleware": "^1.6.1",
+    "webpack-hot-middleware": "^2.10.0"
+  }
+}
