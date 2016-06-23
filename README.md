@@ -67,6 +67,6 @@ if ( module.hot ) {
 Configuration options are passed to the middleware when it is created.
 
  * **configFile** - The path to your webpack.config.js
-
+ * **productionMode** - Do not load the webpack and hmr middleware, any bundles should have been previously bundled
 
 
