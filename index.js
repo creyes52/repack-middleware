@@ -6,7 +6,11 @@ var webpack              = require('webpack');
 var webpackDevMiddleware = require('webpack-dev-middleware');
 var webpackHotMiddleware = require('webpack-hot-middleware');
 var path                 = require('path');
+var helpers              = require('./helpers.js');
 require('babel-register');
+	
+
+
 
 module.exports = (function(options) {
     options               = options || {};
@@ -15,7 +19,6 @@ module.exports = (function(options) {
     var isProd            = options.productionMode ? options.productionMode : process.env.NODE_ENV == 'prod';
     
     var webpackConfig     = require(webpackConfigFile);
-
 
     var renderFn = function(componentName, vars) {
         try {
@@ -76,9 +79,13 @@ module.exports = (function(options) {
     if ( typeof config.entry == 'string' ) {
         config.entry = [ config.entry ];
     }
-	var hmrPath = __dirname + '/node_modules/webpack-hot-middleware/client.js';
+	var hmrPath = helpers.findModule('webpack-hot-middleware');
+	hmrPath = hmrPath + "/client.js";
+	//var hmrPath = __dirname + '/node_modules/webpack-hot-middleware/client.js';
 	//hmrPath = "webpack-hot-middleware/client";
-    var addHmr = function( entry ) { entry.unshift( hmrPath ); }
+    
+
+	var addHmr = function( entry ) { entry.unshift( hmrPath ); }
     if ( typeof config.entry.length == 'number' ) {
         addHmr( config.entry );
     }
