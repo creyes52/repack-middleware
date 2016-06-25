@@ -169,6 +169,7 @@ if ( module.hot ) {
 }
 ```
 
+See a complete example here: [https://github.com/creyes52/repack-middleware-example]
 
 
 
