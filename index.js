@@ -3,7 +3,8 @@ var webpack              = require('webpack');
 var webpackDevMiddleware = require('webpack-dev-middleware');
 var webpackHotMiddleware = require('webpack-hot-middleware');
 var path                 = require('path');
-var reactMiddleware      = require('./reactMiddleware.js');
+var helpers              = require('./helpers.js');
+var reacthelper          = require('./reactHelper.js');
 
 
 module.exports = (function(options) {
@@ -13,10 +14,6 @@ module.exports = (function(options) {
     var isProd            = options.productionMode ? options.productionMode : process.env.NODE_ENV == 'prod';
     var webpackConfig     = require(webpackConfigFile);
 
-    
-    var nullMiddleware = function nullMiddleware(req, res, next) {
-        next();
-    }
 
     /**
     * Configuring webpack middleware
@@ -78,8 +75,18 @@ module.exports = (function(options) {
         }
     });
 
-    var whmr = webpackHotMiddleware(compiler);
 
+
+    //
+    //  These are the internal middleware functions used
+    //
+    var whmr             = webpackHotMiddleware(compiler);
+    var renderMiddleware = reacthelper(options).renderMiddleware;
+    var nullMiddleware   = function nullMiddleware(req, res, next) { next(); }
+
+    //
+    // The public middleware
+    //
 	var repackMiddleware = function repackMiddleware(req, res, next) {
 		var stack = [ wp, whmr, renderMiddleware];
 		var pos   = 0;

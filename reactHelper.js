@@ -1,6 +1,5 @@
 var React          = require('react');
 var ReactDOMServer = require('react-dom/server');
-var helpers        = require('./helpers.js');
 var path           = require('path');
 
 var reactRouter   = require('react-router');
