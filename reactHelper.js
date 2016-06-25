@@ -2,6 +2,12 @@ var React          = require('react');
 var ReactDOMServer = require('react-dom/server');
 var helpers        = require('./helpers.js');
 var path           = require('path');
+
+var reactRouter   = require('react-router');
+var match         = reactRouter.match;
+var RouterContext = reactRouter.RouterContext;
+var RouterContextFactory = React.createFactory( RouterContext );
+
 require('babel-register');
 
 var components = {};

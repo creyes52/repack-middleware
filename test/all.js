@@ -78,6 +78,17 @@ describe('module', function() {
 				cb();
 			});
 		});
+
+		it('should render a route configuration', function(cb) {
+			var req = {
+				url: "/"
+			};
+			reactHelper.renderFn('reactContext', {}, req, function(err, html) {
+				//console.log("err", err, "html", html);
+				assert(html);
+				cb();
+			});
+		});
 	});
 	
 });
