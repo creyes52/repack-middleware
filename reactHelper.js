@@ -27,8 +27,11 @@ module.exports = function(options) {
         //  Load the component, either a component Type or a router plain config
         //
         if ( component == undefined ) {
-			console.log('pasapor qui', componentsPath, componentName);
             var compPath  = path.join(componentsPath, `${componentName}.jsx`);
+            if ( !isProd ) {
+                // invalidate cache
+                delete require.cache[require.resolve(compPath)];
+            }
             var compObj   = require( compPath ).default;
 
             //console.log(`loading component ${compPath} === ${compObj}`);
