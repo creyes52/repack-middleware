@@ -1,15 +1,9 @@
-var React          = require('react');
-var ReactDOMServer = require('react-dom/server');
-var components = {};
 var _                    = require('lodash');
 var webpack              = require('webpack');
 var webpackDevMiddleware = require('webpack-dev-middleware');
 var webpackHotMiddleware = require('webpack-hot-middleware');
 var path                 = require('path');
-var helpers              = require('./helpers.js');
-require('babel-register');
-	
-
+var reactMiddleware      = require('./reactMiddleware.js');
 
 
 module.exports = (function(options) {
@@ -17,40 +11,9 @@ module.exports = (function(options) {
     var webpackConfigFile = options.configFile || "";
     var componentsPath    = options.componentsPath || "";
     var isProd            = options.productionMode ? options.productionMode : process.env.NODE_ENV == 'prod';
-    
     var webpackConfig     = require(webpackConfigFile);
 
-    var renderFn = function(componentName, vars) {
-        try {
-        var component = components[componentName];
-        if ( component == undefined ) {
-            var compPath  = path.join(componentsPath, `${componentName}.jsx`);
-            var compCtor  = require( compPath ).default;
-            component = React.createFactory( compCtor );
-            if ( isProd ) {
-                components[componentName] = component; 
-            }
-        }
-
-        var element = component(vars);
-        return ReactDOMServer.renderToString( element );
-        } catch(err) {
-            console.error(err);
-        }
-    }
-
-    var renderMiddleware = function renderMiddleware(req, res, next) {
-        res.renderReact = function(component, vars) {
-            var html = "";
-            html += `<div id='main'>${renderFn( component, vars)}</div>`;
-            html += `<script type='text/javascript'>var INIT = ${JSON.stringify(vars)}</script>`;
-            res.locals.reactHtml = html;
-            //return res.view();
-			return html;
-        }
-        next();
-    }
-
+    
     var nullMiddleware = function nullMiddleware(req, res, next) {
         next();
     }
