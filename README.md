@@ -65,7 +65,7 @@ var repackMiddleware = require('repack-middleware');
 app.use(repackMiddleware({
 	configFile: __dirname + "/webpack.config.js",
     componentsPath: __dirname + "/components"
-});
+}));
 
 ```
 
@@ -120,6 +120,7 @@ export default class MainComponent extends React.Component {
 This is the entrypoint in the webpack config
 ```
 import MainComponent from './MainComponent.jsx'
+import React from 'react';
 import { render } from 'react-dom'
 
 var doRender = function() {
