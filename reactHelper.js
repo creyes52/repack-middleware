@@ -1,14 +1,13 @@
 var React          = require('react');
 var ReactDOMServer = require('react-dom/server');
 var path           = require('path');
+var webpack        = require('webpack');
 
-var reactRouter   = require('react-router');
-var match         = reactRouter.match;
-var RouterContext = reactRouter.RouterContext;
+var reactRouter          = require('react-router');
+var match                = reactRouter.match;
+var RouterContext        = reactRouter.RouterContext;
 var RouterContextFactory = React.createFactory( RouterContext );
-
-require('babel-register');
-
+var Reconfigure          = require('./reconfigure.js');
 var components = {};
 
 module.exports = function(options) {
@@ -17,11 +16,38 @@ module.exports = function(options) {
 
     var wrapHtml = function(html, vars) {
         return `<div id='main'>${html}</div>`
-                + `<script type='text/javascript'>var INIT = ${JSON.stringify(vars)}</script>`;
+             + `<script type='text/javascript'>var INIT = ${JSON.stringify(vars)}</script>`;
     }
+
+	var createBundle = function(cb) {
+		var reconf = new Reconfigure(options);
+		var config = reconf.addDefaultConfiguration( reconf.webpackConfig );
+		var compiler = webpack(config);
+
+		compiler.run(function(err, stats) {
+			if ( err ) 
+				console.error("Fatal error:", err );
+
+			var jsonStats = stats.toJson();
+			if ( jsonStats.errors.length > 0) {
+				console.error("Errors found:" );
+				jsonStats.errors.forEach( val => {
+					console.log( "#### => ", val );
+				});
+			}
+			if ( jsonStats.warnings.length > 0) {
+				console.error("Warnings found:", jsonStats.warnings);
+			}
+
+			console.log("success");
+			cb();
+		});
+	}
 
     var renderFn = function(componentName, vars, req, cb) {
         var component = components[componentName];
+
+		return null;
 
         //
         //  Load the component, either a component Type or a router plain config
@@ -106,7 +132,8 @@ module.exports = function(options) {
 
     return {
         renderMiddleware: renderMiddleware,
-        renderFn: renderFn
+        renderFn: renderFn,
+		createBundle: createBundle 
     };
 };
 

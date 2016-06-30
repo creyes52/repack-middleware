@@ -5,59 +5,21 @@ var webpackHotMiddleware = require('webpack-hot-middleware');
 var path                 = require('path');
 var helpers              = require('./helpers.js');
 var reacthelper          = require('./reactHelper.js');
+var Reconfigure          = require('./reconfigure.js');
 
-
+/**
+* options.configFile {String} - Path of the webpack.config.js file
+* options.componentsPath {String} - Path where to look for components
+* options.isProd {Boolean} - true for production mode
+*/
 module.exports = (function(options) {
     options               = options || {};
-    var webpackConfigFile = options.configFile || "";
-    var componentsPath    = options.componentsPath || "";
     var isProd            = options.productionMode ? options.productionMode : process.env.NODE_ENV == 'prod';
-    var webpackConfig     = require(webpackConfigFile);
+	var reconfigure       = new Reconfigure( options );
 
-
-    /**
-    * Configuring webpack middleware
-    * This middleware, and the HMR (hot module replacement) are only used in develpment
-    *
-    */
-    
-    //
-    // ======== reconfigure configuration =======
-    //
-    var config = _.defaultsDeep({}, webpackConfig, {
-        output: {
-            path: "/",
-            publicPath: "/build/" // used to prefix json updates
-        },
-        devtool: 'source-map',
-        plugins: []
-    });
-
-    //
-    //  ========== HMR configuration ======
-    //
-    if ( typeof config.entry == 'string' ) {
-        config.entry = [ config.entry ];
-    }
-	var hmrPath = helpers.findModule('webpack-hot-middleware');
-	hmrPath = hmrPath + "/client.js";
-	//var hmrPath = __dirname + '/node_modules/webpack-hot-middleware/client.js';
-	//hmrPath = "webpack-hot-middleware/client";
-    
-
-	var addHmr = function( entry ) { entry.unshift( hmrPath ); }
-    if ( typeof config.entry.length == 'number' ) {
-        addHmr( config.entry );
-    }
-    else if ( typeof config.entry == 'object' ) {
-        _.values( config.entry ).forEach( addHmr );
-    } 
-
-    config.plugins.unshift(
-        new webpack.optimize.OccurenceOrderPlugin(),
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoErrorsPlugin()
-    );
+	var config = reconfigure.addDefaultConfiguration();
+	config = reconfigure.addHmrMiddleware( config );
+	config = reconfigure.addReact ( config );
 
     //
     // ======= webpack middleware and hmr middleware ====
@@ -74,8 +36,6 @@ module.exports = (function(options) {
             poll: true
         }
     });
-
-
 
     //
     //  These are the internal middleware functions used
