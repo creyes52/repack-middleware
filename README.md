@@ -54,21 +54,21 @@ This is the view that is being called form the route
 import React from 'react';
 
 export default class MainComponent extends React.Component {
-	render() {
-		var myObjects = this.props.myObjects || [];
-		var myStyle = {
-			border: "solid 1px #00F"
-		};
+    render() {
+        var myObjects = this.props.myObjects || [];
+        var myStyle = {
+            border: "solid 1px #0F0"
+        };
 
-		return (
-			<div style={myStyle}>
-				<h1>This is react</h1>
-				{myObjects.map( (obj, idx) => {
-					return <li key={idx}>[ {obj.count} ] {obj.name}</li>
-				})}
-			</div>
-		);
-	}
+        return (
+            <div style={myStyle}>
+                <h1>This could be React</h1>
+                {myObjects.map( (obj, idx) => {
+                    return <li key={idx}> {obj.size} {obj.name}</li>
+                })}
+            </div>
+        );
+    }
 }
 ```
 
@@ -79,10 +79,14 @@ should be inserted.
 ```
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    var myProps = {
-        data: [1,2,3]
+	var myProps = {
+        myObjects: [
+        	{name: "User 1", size: 11},
+        	{name: "User 2", size: 20},
+        	{name: "User 3", size: 30}
+        ]
     };
-    
+
     res.renderReact('MainComponent', myProps, function(err, html) {
         res.locals.reactHtml = html;
         res.render('index', {title: "Hello world"} );
