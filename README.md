@@ -1,96 +1,78 @@
 
 # Repack middleware
-Simplify installatin of webpack-middleware with hot module replacement in an express-like application,
-if using React, it will also add a res.renderReact(component, vars) to generate react html on the server
-that can be used to iplement isomorphic react.
+Simply way to use React on your apps, with ES6 syntax, and JSX syntax, and hot module replacement. 
+
 
 ## Installation & usage
 
 Frist, install the npm module
 ```
-npm install --save-dev repack-middleware
-```
-
-Also (if using react, probably with babel compiler, install the dependencies)
-```
-npm install babel-core babel-loader babel-preset-es2015 babel-preset-react react react-dom
+npm install repack-middleware
 ```
 
 ### Configuration files
 
-Next, create your **webpack.config.js**
-Example:
-
-./webpack.config.js
+Create a webpack config file
 ```
 module.exports = {
     entry: "./components/main.jsx",
     output: {
-            //path: "./public/build",
-            filename: "app.bundle.js",
-            publicPath: "/build/"
-    },
-    resolve: {
-        extensions: ["", ".webpack.js", ".web.js", ".js", ".jsx"]
-    },
-    module: {
-        loaders: [
-            {
-                test: /\.jsx?$/,
-                exclude: /node_modules/,
-                loader: 'babel'
-            }
-
-        ]
+        filename: "app.bundle.js",
+        publicPath: "/build/"
     }
 }
-
-```  
-The ```resolve``` is to allow us to load jsx without specifying the extension
-
-
-Next, create a **.babelrc**
-```
- { "presets": [ "es2015", "react" ] }
 ```
 
 
+Add the middleware to your app.
 
-
-Now add the middleware into your server.
 ```
 var repackMiddleware = require('repack-middleware');
 
+// ... include the middleware before other routes
 
 app.use(repackMiddleware({
-	configFile: __dirname + "/webpack.config.js",
+	configFile    : __dirname + "/webpack.config.js",
     componentsPath: __dirname + "/components"
 }));
-
 ```
 
-With the configuration above, the middlware will serve the bundled resource in the route **/build/app.bundle.js**  
-Add it to your html:  
 
+Include the bundled script in your html.
+The middleware will generate the bundle in memory and serve it on the publicPath specified in the webpack.config.js 
 ```
 <script type="text/javascript" src="/build/app.bundle.js"></script>
 ```
 
 ### Usage
 
-Example route:
 
+Create the entry file:
+
+**./components/main.jsx**
 ```
-res.renderReact('MainComponent', {myObjects: data}, function(err, html) {
-    res.locals.reactHtml = html;
-    res.render('index', {title: "Hello world"} );
-});
+import MainComponent from './MainComponent.jsx'
+import React from 'react';
+import { render } from 'react-dom'
+
+var doRender = function() {
+	render(
+		<MainComponent/>,
+		document.getElementById("main")
+	)
+}
+doRender();
+
+if ( module.hot ) {
+	module.hot.accept(function() {
+		doRender();
+	});
+} 
 ```
 
-Example component:
+And a single component
 
-
-**MainComponent.jsx**  
+**./components/MainComponent.jsx**  
 This is the view that is being called form the route
 
 ```
@@ -115,62 +97,35 @@ export default class MainComponent extends React.Component {
 }
 ```
 
+Generate the entry point as an empty div from your route  
+This is so later, when doing server side rendering, the generated html will be here instead of an empty div.
 
-**main.jsx**  
-This is the entrypoint in the webpack config
 ```
-import MainComponent from './MainComponent.jsx'
-import React from 'react';
-import { render } from 'react-dom'
-
-var doRender = function() {
-	render(
-		<MainComponent/>,
-		document.getElementById("main")
-	)
-}
-doRender();
-
-if ( module.hot ) {
-	module.hot.accept(function() {
-		doRender();
-	});
-} 
+/* GET home page. */
+router.get('/', function(req, res, next) {
+    var myProps = {
+        data: [1,2,3]
+    };
+    
+    res.renderReact('MainComponent', myProps, function(err, html) {
+        res.locals.reactHtml = html;
+        res.render('index', {title: "Hello world"} );
+    });
+});
 ```
 
-
-
-With an index view (example provided in jade)
+And in the view (jade)
 ```
-extends layout
-
-block content
-    h1= title
-    div!= reactHtml
+    != reactHtml
 ```
 
 Note the ```!=``` used to inject the variable in unescaped way.
 
+Testing
 
-### Hot module replacement
-
-Your code is responsible for handling the events.  
-The module will have **module.hot** as an object, ready to accept notifications when it was modified.  
-Example of how to make the module aware of changes.
-```
-var render = function() {
-    document.getElementById("main").innerHTML = "Hola mundo " + Date.now();
-}
-render();
-
-if ( module.hot ) { 
-    module.hot.accept(function() {
-        render();
-    }); 
-}
-```
-
-See a complete example here: [https://github.com/creyes52/repack-middleware-example]
+* Start your server
+* Go and modify something in either .jsx file  
+   Your browser should have received the modifications without reloading
 
 
 
