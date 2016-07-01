@@ -10,7 +10,7 @@ var Reconfigure          = require('./reconfigure.js');
 /**
 * options.configFile {String} - Path of the webpack.config.js file
 * options.componentsPath {String} - Path where to look for components
-* options.isProd {Boolean} - true for production mode
+* options.productionMode {Boolean} - true for production mode
 * options.serverRender {Boolean} - true to generate rendered html on the server, false will just insert the main element
 * options.elementId {String} - The id of the div that will be created containing server side rendered html if enabled or empty (the node on which the React root component will be mounted)
 */

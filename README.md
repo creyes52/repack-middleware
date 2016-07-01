@@ -15,7 +15,6 @@ npm install repack-middleware
 Create a webpack config file
 ```
 module.exports = {
-    entry: "./components/main.jsx",
     output: {
         filename: "app.bundle.js",
         publicPath: "/build/"
@@ -46,31 +45,7 @@ The middleware will generate the bundle in memory and serve it on the publicPath
 
 ### Usage
 
-
-Create the entry file:
-
-**./components/main.jsx**
-```
-import MainComponent from './MainComponent.jsx'
-import React from 'react';
-import { render } from 'react-dom'
-
-var doRender = function() {
-	render(
-		<MainComponent/>,
-		document.getElementById("main")
-	)
-}
-doRender();
-
-if ( module.hot ) {
-	module.hot.accept(function() {
-		doRender();
-	});
-} 
-```
-
-And a single component
+Create the main component:
 
 **./components/MainComponent.jsx**  
 This is the view that is being called form the route
@@ -98,8 +73,8 @@ export default class MainComponent extends React.Component {
 ```
 
 
-Now, modify your route to generate the entry point as an empty div from your route  
-This is so that later, when doing server side rendering, the generated html will be here instead of an empty div.
+Now, in your route, call res.renderReact() to generate the insert html where the the react component
+should be inserted.
 
 ```
 /* GET home page. */
@@ -129,7 +104,6 @@ Testing
    Your browser should have received the modifications without reloading
 
 
-
 ## Documentation
 
 ### Config
@@ -139,12 +113,16 @@ Configuration options are passed to the middleware when it is created.
 ```repackMiddleware ( options )```
 
  * **options.configFile** - The path to your webpack.config.js
- * **options.productionMode** - Do not load the webpack and hmr middleware, any bundles should have been previously bundled
  * **options.componentsPath** - Specifies the folder
+ * **options.elementId** - What id to use for the inserted html (the target to ReactDOM.render )
+ * **options.productionMode** - Do not load the webpack and hmr middleware, any bundles should have been previously bundled
 
 ### renderReact
 
-```res.renderReact ( componentRelativePath, propsObject, callback )```  
+```res.renderReact ( componentName, propsObject, callback )```
+
+the **propsObject** should specify the initial props, these will be inserted in a &lt;script&gt; tag  
+to initialize the **componentName** with these props.
 
 Callback signature  
 
