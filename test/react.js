@@ -10,9 +10,9 @@ var reactHelper = require('../reactHelper')({
 });
 
 
-describe('module', function() {
+describe('reactHelper.js', function() {
 
-	describe('reactHelper.js', function() {
+	describe('renderfn', function() {
 
 		xit('should render a simple component', function(cb) {
 			reactHelper.renderFn('Simple', {}, null, function(err, html) {
@@ -31,11 +31,27 @@ describe('module', function() {
 			});
 		});
 
-		it('should compile a component, given the default configuration', function(cb) {
+	});
+
+	describe('createBundle', function() {
+		xit('should compile a component, given the default configuration', function(cb) {
 		this.timeout(9000);
 			reactHelper.createBundle(cb, false, true);
 		});
 
+	});
+
+	describe('createEntryScript', function() {
+
+		it('should generate a file', function(cb) {
+			var filePath = reactHelper.createEntryScript(__dirname+"/stubs");
+
+			console.log(filePath);
+			fs.stat(filePath, (err, stats) => {
+				assert.isNull(err);
+				cb();
+			});
+		});
 
 	});
 

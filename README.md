@@ -97,8 +97,9 @@ export default class MainComponent extends React.Component {
 }
 ```
 
-Generate the entry point as an empty div from your route  
-This is so later, when doing server side rendering, the generated html will be here instead of an empty div.
+
+Now, modify your route to generate the entry point as an empty div from your route  
+This is so that later, when doing server side rendering, the generated html will be here instead of an empty div.
 
 ```
 /* GET home page. */

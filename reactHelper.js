@@ -2,6 +2,11 @@ var React          = require('react');
 var ReactDOMServer = require('react-dom/server');
 var path           = require('path');
 var webpack        = require('webpack');
+var temp           = require('temp');
+var fs             = require('fs');
+var _              = require('lodash');
+
+temp.track();
 
 var reactRouter          = require('react-router');
 var match                = reactRouter.match;
@@ -15,9 +20,13 @@ module.exports = function(options) {
     var componentsPath = options.componentsPath;
 	var targetId       = options.elementId || "main";
 
-    var wrapHtml = function(html, vars) {
+    var wrapHtml = function(html, vars, componentName) {
+        var INIT = {
+            initialProps: vars,
+            rootComponent: componentName
+        };
         return `<div id='${targetId}'>${html}</div>`
-             + `<script type='text/javascript'>var INIT = ${JSON.stringify(vars)}</script>`;
+             + `<script type='text/javascript'>var INIT = ${JSON.stringify(INIT)}</script>`;
     }
 
 	var createBundle = function(cb) {
@@ -47,10 +56,54 @@ module.exports = function(options) {
 		});
 	}
 
+
+    var createEntryScript = function(componentsPath) {
+        var files = fs.readdirSync(componentsPath);
+        files = _(files)
+            .filter(val => val.endsWith(".jsx")                )
+            .map(   val => val.substr(0, val.indexOf(".jsx"))  )
+            .value();
+        
+        var loadFiles = files.map(val => `import ${val} from '${val}.jsx';`).join("\n");
+        var listFiles = files.map(val => `'${val}': ${val}`).join(",");
+        
+        var content = `
+        // entry point script
+        import React from 'react';
+        import { render } from 'react-dom';
+        \n${loadFiles}
+        var compList = {${listFiles}}
+        var doRender = function() {
+            var props         = INIT.initialProps  || null;
+            var rootComponent = INIT.rootComponent || "MainComponent";
+
+            console.log("rendering", rootComponent);
+            render(
+                React.createElement( compList[rootComponent], props),
+                document.getElementById("main")
+            )
+        }
+
+        doRender();
+
+        if ( module.hot ) {
+            module.hot.accept(function() {
+                doRender();
+            });
+        }
+        // end entry point script`;
+        
+        var tempFile = temp.openSync({suffix: ".jsx"});
+        fs.writeSync( tempFile.fd, content );
+        
+        //console.log("entry file:", content);
+        return tempFile.path;
+    }
+
     var renderFn = function(componentName, vars, req, cb) {
         var component = components[componentName];
 
-		return cb( null, wrapHtml("", vars));
+		return cb( null, wrapHtml("", vars, componentName));
 
         //
         //  Load the component, either a component Type or a router plain config
@@ -81,7 +134,7 @@ module.exports = function(options) {
             
             var element   = component(vars);
             var reactHtml = ReactDOMServer.renderToString( element );
-            var html      = wrapHtml(reactHtml, vars);
+            var html      = wrapHtml(reactHtml, vars, componentName);
             cb ( null, html );
 
         } else {
@@ -104,7 +157,7 @@ module.exports = function(options) {
                     // dump the HTML into a template, lots of ways to do this, but none are
                     // really influenced by React Router
                     var reactHtml = ReactDOMServer.renderToString(appHtml);
-                    var html      = wrapHtml( reactHtml, vars );
+                    var html      = wrapHtml( reactHtml, vars, componentName );
                     cb ( err, html );
                 } else {
                     cb ( null, null ); // null for not found
@@ -136,7 +189,8 @@ module.exports = function(options) {
     return {
         renderMiddleware: renderMiddleware,
         renderFn: renderFn,
-		createBundle: createBundle 
+		createBundle: createBundle,
+        createEntryScript: createEntryScript 
     };
 };
 

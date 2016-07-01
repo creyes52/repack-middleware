@@ -21,6 +21,12 @@ module.exports = (function(options) {
 	var reconfigure = new Reconfigure( options );
 	var config      = reconfigure.addDefaultConfiguration();
 	config = reconfigure.addHmrMiddleware( config );
+	
+	// adding generated entry point 
+	var entryFile = reacthelper(options).createEntryScript( options.componentsPath );
+	config = reconfigure.prependEntry(config, entryFile);
+	
+	// adding libraries
 	config = reconfigure.addReact ( config, {
 		hmr: (isProd) ? false : true,
 		externals: true,
@@ -29,7 +35,8 @@ module.exports = (function(options) {
 		reactDom: true
 	});
 
-	console.log( config );
+
+	//console.log("webpack config:", config);
 
     //
     // ======= webpack middleware and hmr middleware ====

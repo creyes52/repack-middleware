@@ -26,6 +26,9 @@ class Reconfigure {
 				path: "/",
 				publicPath: "/" // used to prefix json updates
 			},
+			resolve: {
+				root: path.join(this.componentsPath, ".")
+			},
 			devtool: 'source-map',
 			plugins: [],
 			externals: {},
@@ -56,8 +59,9 @@ class Reconfigure {
 			return entry;
 		}
 
-
-		if ( Array.isArray( config.entry) ) {
+		if ( !config.entry  ) {
+			config.entry = newEntry;
+		} else if ( Array.isArray( config.entry) ) {
 			config.entry = addHmr( config.entry );
 		} else if ( typeof config.entry == 'object' ) {
 			config.entry = _.mapValues( config.entry, addHmr );

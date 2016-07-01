@@ -4,7 +4,7 @@
   "description": "Express-like middleware to webpack/hot module update modules",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon ./node_modules/mocha/bin/mocha test/all.js"
+    "test": "nodemon ./node_modules/mocha/bin/mocha"
   },
   "keywords": [
     "react",
@@ -28,6 +28,7 @@
     "react": "^15.1.0",
     "react-dom": "^15.1.0",
     "react-router": "^2.5.1",
+    "temp": "^0.8.3",
     "webpack": "^1.13.1",
     "webpack-dev-middleware": "^1.6.1",
     "webpack-hot-middleware": "^2.10.0"
