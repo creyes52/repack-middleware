@@ -27,8 +27,9 @@ class Reconfigure {
 				publicPath: "/" // used to prefix json updates
 			},
 			resolve: {
-				root: path.join(this.componentsPath, ".")
+				//root: path.join(this.componentsPath, ".")
 			},
+			//context: path.join(this.componentsPath, ".."),
 			devtool: 'source-map',
 			plugins: [],
 			externals: {},
@@ -86,7 +87,7 @@ class Reconfigure {
 			config.externals['react']     = 'React';
 		}
 		var testExpr = /.*dist.*\.js$/;
-		testExpr = /.*\.min\.js$/;
+		//testExpr = /.*\.min\.js$/;
 
 		if ( noparse ) {
 			config.noParse                = testExpr;
@@ -111,13 +112,13 @@ class Reconfigure {
 		
 
 		if ( reactDom ) {
-			var reactDomPath = require.resolve('react-dom/dist/react-dom.min.js');
-			//var reactDomPath = require.resolve('react-dom/dist/react-dom.js');
+			//var reactDomPath = require.resolve('react-dom/dist/react-dom.min.js');
+			var reactDomPath = require.resolve('react-dom/dist/react-dom.js');
 			config = this.prependEntry( config, reactDomPath );
 		}
 		if ( react ) {
-			var reactPath = require.resolve('react/dist/react.min.js');
-			//var reactPath = require.resolve('react/dist/react.js');
+			//var reactPath = require.resolve('react/dist/react.min.js');
+			var reactPath = require.resolve('react/dist/react.js');
 			config = this.prependEntry( config, reactPath );
 		}
 			

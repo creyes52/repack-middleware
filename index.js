@@ -37,6 +37,7 @@ module.exports = (function(options) {
 
 
 	//console.log("webpack config:", config);
+	//console.log("loaders:", config.module.loaders[1].query.presets);
 
     //
     // ======= webpack middleware and hmr middleware ====

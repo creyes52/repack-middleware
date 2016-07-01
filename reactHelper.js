@@ -61,10 +61,11 @@ module.exports = function(options) {
         var files = fs.readdirSync(componentsPath);
         files = _(files)
             .filter(val => val.endsWith(".jsx")                )
+            .filter(val => val.indexOf(".startup.jsx") == -1   )
             .map(   val => val.substr(0, val.indexOf(".jsx"))  )
             .value();
         
-        var loadFiles = files.map(val => `import ${val} from '${val}.jsx';`).join("\n");
+        var loadFiles = files.map(val => `import ${val} from './${val}.jsx';`).join("\n");
         var listFiles = files.map(val => `'${val}': ${val}`).join(",");
         
         var content = `
@@ -74,6 +75,7 @@ module.exports = function(options) {
         \n${loadFiles}
         var compList = {${listFiles}}
         var doRender = function() {
+            var INIT = INIT || {};
             var props         = INIT.initialProps  || null;
             var rootComponent = INIT.rootComponent || "MainComponent";
 
@@ -92,12 +94,16 @@ module.exports = function(options) {
             });
         }
         // end entry point script`;
-        
-        var tempFile = temp.openSync({suffix: ".jsx"});
-        fs.writeSync( tempFile.fd, content );
-        
         //console.log("entry file:", content);
-        return tempFile.path;
+
+        
+        //var tempFile = temp.openSync({suffix: ".jsx"});
+        //fs.writeSync( tempFile.fd, content );
+        //return tempFile.path;
+
+        var tempFile = path.join(options.componentsPath, ".startup.jsx");
+        fs.writeFileSync( tempFile, content );
+        return tempFile;
     }
 
     var renderFn = function(componentName, vars, req, cb) {
