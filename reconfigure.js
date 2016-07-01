@@ -1,13 +1,12 @@
 'use strict'
+var _                    = require('lodash');
+var webpack              = require('webpack');
+var path                 = require('path');
+
 /**
 *  This module creates a new configuration for webpack,
 *  Adds hot module replacement entry, source maps, react and react-dom as externals
 */
-
-
-var _                    = require('lodash');
-var webpack              = require('webpack');
-
 class Reconfigure {
 
 	constructor( options ) {
@@ -29,13 +28,11 @@ class Reconfigure {
 			},
 			devtool: 'source-map',
 			plugins: [],
-			externals: {
-				// "node/npm module name" : "name of exported library variable"
-				'react': 'React',
-				'react-dom': 'ReactDOM'
-			},
+			externals: {},
 			module: {
-				noParse: /.*\.min\.js$/
+			},
+			resolveLoader: {
+				root: path.join(__dirname, "node_modules"),
 			}
 		};
 
@@ -71,21 +68,59 @@ class Reconfigure {
 		return config;
 	}
 
-	addReact( config ) {
+	addReact( config, options ) {
+		options = options || {};
+		var hmr       = options.hmr       === undefined ? true  : options.hmr;
+		var externals = options.externals === undefined ? false : options.externals;
+		var react     = options.react     === undefined ? false : options.react;
+		var reactDom  = options.reactDom  === undefined ? false : options.reactDom;
+		var noparse   = options.noparse   === undefined ? false : options.noparse;
 		var config = _.cloneDeep ( config );
 
-		var hmrPath = require.resolve('webpack-hot-middleware/client.js');
-		//var hmrPath = helpers.findModule('webpack-hot-middleware');
-		//hmrPath = hmrPath + "/client.js";
-		//var hmrPath = __dirname + '/node_modules/webpack-hot-middleware/client.js';
-		//hmrPath = "webpack-hot-middleware/client";
-		config = this.prependEntry ( config, hmrPath );
+		if ( externals ) {
+			config.externals['react-dom'] = 'ReactDOM';
+			config.externals['react']     = 'React';
+		}
+		var testExpr = /.*dist.*\.js$/;
+		testExpr = /.*\.min\.js$/;
 
-		var reactRuntime = require.resolve('react/dist/react.min.js');
-		config = this.prependEntry( config, reactRuntime );
+		if ( noparse ) {
+			config.noParse                = testExpr;
 
-		var reactDom = require.resolve('react-dom/dist/react-dom.min.js');
-		config = this.prependEntry( config, reactDom );
+			config.module.loaders = config.module.loaders || [];
+			config.module.loaders.push({
+				test  : testExpr,
+				loader: "imports?define=>false,exports=>false"
+			});
+
+			config.module.loaders = config.module.loaders || [];
+			config.module.loaders.push({
+				test: /\.jsx?$/,
+				exclude: /node_modules/,
+				loader: 'babel',
+				query: {
+					presets: ['babel-preset-react', 'babel-preset-es2015'].map(require.resolve)
+				}
+			});
+
+		}
+		
+
+		if ( reactDom ) {
+			var reactDomPath = require.resolve('react-dom/dist/react-dom.min.js');
+			//var reactDomPath = require.resolve('react-dom/dist/react-dom.js');
+			config = this.prependEntry( config, reactDomPath );
+		}
+		if ( react ) {
+			var reactPath = require.resolve('react/dist/react.min.js');
+			//var reactPath = require.resolve('react/dist/react.js');
+			config = this.prependEntry( config, reactPath );
+		}
+			
+		if ( hmr ) {
+			var hmrPath = require.resolve('webpack-hot-middleware/client.js');
+			config = this.prependEntry ( config, hmrPath );
+		}
 
 		return config;
 
@@ -99,9 +134,14 @@ class Reconfigure {
 		}
 		
 		config.plugins.unshift(
-			new webpack.optimize.OccurenceOrderPlugin(),
+			//new webpack.optimize.OccurenceOrderPlugin(),
 			new webpack.HotModuleReplacementPlugin(),
 			new webpack.NoErrorsPlugin()
+			/*,new webpack.optimize.UglifyJsPlugin({
+				compress: {
+					warnings: false
+				}
+			})*/
 		);
 
 		return config;

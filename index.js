@@ -11,15 +11,25 @@ var Reconfigure          = require('./reconfigure.js');
 * options.configFile {String} - Path of the webpack.config.js file
 * options.componentsPath {String} - Path where to look for components
 * options.isProd {Boolean} - true for production mode
+* options.serverRender {Boolean} - true to generate rendered html on the server, false will just insert the main element
+* options.elementId {String} - The id of the div that will be created containing server side rendered html if enabled or empty (the node on which the React root component will be mounted)
 */
 module.exports = (function(options) {
     options               = options || {};
     var isProd            = options.productionMode ? options.productionMode : process.env.NODE_ENV == 'prod';
-	var reconfigure       = new Reconfigure( options );
-
-	var config = reconfigure.addDefaultConfiguration();
+	
+	var reconfigure = new Reconfigure( options );
+	var config      = reconfigure.addDefaultConfiguration();
 	config = reconfigure.addHmrMiddleware( config );
-	config = reconfigure.addReact ( config );
+	config = reconfigure.addReact ( config, {
+		hmr: (isProd) ? false : true,
+		externals: true,
+		noparse: true,
+		react: true,
+		reactDom: true
+	});
+
+	console.log( config );
 
     //
     // ======= webpack middleware and hmr middleware ====

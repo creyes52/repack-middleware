@@ -14,14 +14,14 @@ describe('module', function() {
 
 	describe('reactHelper.js', function() {
 
-		it('should render a simple component', function(cb) {
+		xit('should render a simple component', function(cb) {
 			reactHelper.renderFn('Simple', {}, null, function(err, html) {
 				assert.isDefined(html, "html generated was incorrect");
 				cb();
 			});
 		});
 
-		it('should render a route configuration', function(cb) {
+		xit('should render a route configuration', function(cb) {
 			var req = {
 				url: "/"
 			};
@@ -33,7 +33,7 @@ describe('module', function() {
 
 		it('should compile a component, given the default configuration', function(cb) {
 		this.timeout(9000);
-			reactHelper.createBundle(cb);
+			reactHelper.createBundle(cb, false, true);
 		});
 
 

@@ -13,15 +13,18 @@ var components = {};
 module.exports = function(options) {
     var isProd         = options.isProd;
     var componentsPath = options.componentsPath;
+	var targetId       = options.elementId || "main";
 
     var wrapHtml = function(html, vars) {
-        return `<div id='main'>${html}</div>`
+        return `<div id='${targetId}'>${html}</div>`
              + `<script type='text/javascript'>var INIT = ${JSON.stringify(vars)}</script>`;
     }
 
 	var createBundle = function(cb) {
 		var reconf = new Reconfigure(options);
 		var config = reconf.addDefaultConfiguration( reconf.webpackConfig );
+		config = reconf.addReact( config );
+
 		var compiler = webpack(config);
 
 		compiler.run(function(err, stats) {
@@ -47,7 +50,7 @@ module.exports = function(options) {
     var renderFn = function(componentName, vars, req, cb) {
         var component = components[componentName];
 
-		return null;
+		return cb( null, wrapHtml("", vars));
 
         //
         //  Load the component, either a component Type or a router plain config
