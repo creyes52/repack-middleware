@@ -18,31 +18,33 @@ module.exports = (function(options) {
     options               = options || {};
     var isProd            = options.productionMode ? options.productionMode : process.env.NODE_ENV == 'prod';
 	
+	// 
+	// Generate the new configuration    	
+	// 	
+	
 	var reconfigure = new Reconfigure( options );
 	var config      = reconfigure.addDefaultConfiguration();
-	config = reconfigure.addHmrMiddleware( config );
+	config          = reconfigure.addHmrMiddleware( config );
 	
 	// adding generated entry point 
-	var entryFile = reacthelper(options).createEntryScript( options.componentsPath );
-	config = reconfigure.prependEntry(config, entryFile);
+	var entryFile   = reacthelper(options).createEntryScript( options.componentsPath );
+	config          = reconfigure.prependEntry(config, entryFile);
 	
 	// adding libraries
-	config = reconfigure.addReact ( config, {
+	config = reconfigure.addReact ( config, options.internals || {
 		hmr: (isProd) ? false : true,
 		externals: true,
 		noparse: true,
 		react: true,
 		reactDom: true
 	});
-
-
 	//console.log("webpack config:", config);
 	//console.log("loaders:", config.module.loaders[1].query.presets);
+
 
     //
     // ======= webpack middleware and hmr middleware ====
     //
-    
     var compiler = webpack( config );
     var wp       = webpackDevMiddleware( compiler, {
         publicPath: config.output.publicPath , // public path where bundle and json is actually served
@@ -54,14 +56,14 @@ module.exports = (function(options) {
             poll: true
         }
     });
+    var whmr             = webpackHotMiddleware(compiler);
 
+    
     //
     //  These are the internal middleware functions used
     //
-    var whmr             = webpackHotMiddleware(compiler);
     var renderMiddleware = reacthelper(options).renderMiddleware;
-    var nullMiddleware   = function nullMiddleware(req, res, next) { next(); }
-
+    
     //
     // The public middleware
     //
@@ -70,8 +72,9 @@ module.exports = (function(options) {
 		var pos   = 0;
 
 		if ( isProd ) {
-			// we won't call webpack-middleware nor hot module replacement middleware in production
-			stack = [ renderMiddleware ];
+			// we won't call webpack-middleware nor hot module replacement middleware in production,
+			// only the middleware that adds res.renderReact
+			return renderMiddleware(req, res, next);
 		}
 
 		var theNext = function() {
@@ -83,6 +86,7 @@ module.exports = (function(options) {
 		};
 		theNext();
 	}
+
 
 	return repackMiddleware;
 });

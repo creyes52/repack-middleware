@@ -34,10 +34,10 @@ class Reconfigure {
 			plugins: [],
 			externals: {},
 			module: {
-			},
+			}/*,
 			resolveLoader: {
 				root: path.join(__dirname, "node_modules"),
-			}
+			}*/
 		};
 
 
@@ -97,18 +97,17 @@ class Reconfigure {
 				test  : testExpr,
 				loader: "imports?define=>false,exports=>false"
 			});
-
-			config.module.loaders = config.module.loaders || [];
-			config.module.loaders.push({
-				test: /\.jsx?$/,
-				exclude: /node_modules/,
-				loader: 'babel',
-				query: {
-					presets: ['babel-preset-react', 'babel-preset-es2015'].map(require.resolve)
-				}
-			});
-
 		}
+
+		config.module.loaders = config.module.loaders || [];
+		config.module.loaders.push({
+			test: /\.jsx$/,
+			exclude: /node_modules/,
+			loader: 'babel',
+			query: {
+				presets: ['babel-preset-react', 'babel-preset-es2015'].map(require.resolve)
+			}
+		});
 		
 
 		if ( reactDom ) {

@@ -75,15 +75,19 @@ module.exports = function(options) {
         \n${loadFiles}
         var compList = {${listFiles}}
         var doRender = function() {
-            var INIT = INIT || {};
+            var INIT = window.INIT || {};
             var props         = INIT.initialProps  || null;
             var rootComponent = INIT.rootComponent || "MainComponent";
+            var targetEl      = document.getElementById("main");
 
             console.log("rendering", rootComponent);
-            render(
-                React.createElement( compList[rootComponent], props),
-                document.getElementById("main")
-            )
+            
+            if ( targetEl ) {
+                render(
+                    React.createElement( compList[rootComponent], props),
+                    targetEl
+                );
+            }
         }
 
         doRender();
