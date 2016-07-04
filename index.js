@@ -13,70 +13,57 @@ var Reconfigure          = require('./reconfigure.js');
 * options.productionMode {Boolean} - true for production mode
 * options.serverRender {Boolean} - true to generate rendered html on the server, false will just insert the main element
 * options.elementId {String} - The id of the div that will be created containing server side rendered html if enabled or empty (the node on which the React root component will be mounted)
+* options.generateEntry {Boolean} - [false] whether or not to generate the entry point file
 */
 module.exports = (function(options) {
     options               = options || {};
-    var isProd            = options.productionMode ? options.productionMode : process.env.NODE_ENV == 'prod';
+    var isProd            = options.productionMode ? options.productionMode : process.env.NODE_ENV == 'production';
+    var stack             = [];
 	
-	// 
-	// Generate the new configuration    	
-	// 	
-	
-	var reconfigure = new Reconfigure( options );
-	var config      = reconfigure.addDefaultConfiguration();
-	config          = reconfigure.addHmrMiddleware( config );
-	
-	// adding generated entry point 
-	var entryFile   = reacthelper(options).createEntryScript( options.componentsPath );
-	config          = reconfigure.prependEntry(config, entryFile);
-	
-	// adding libraries
-	config = reconfigure.addReact ( config, options.internals || {
-		hmr: (isProd) ? false : true,
-		externals: true,
-		noparse: true,
-		react: true,
-		reactDom: true
-	});
-	//console.log("webpack config:", config);
-	//console.log("loaders:", config.module.loaders[1].query.presets);
-
-
-    //
-    // ======= webpack middleware and hmr middleware ====
-    //
-    var compiler = webpack( config );
-    var wp       = webpackDevMiddleware( compiler, {
-        publicPath: config.output.publicPath , // public path where bundle and json is actually served
-        stats: {
-            colors: true,
-        },
-        noInfo: true,
-        watchOptions:{
-            poll: true
-        }
-    });
-    var whmr             = webpackHotMiddleware(compiler);
-
-    
     //
     //  These are the internal middleware functions used
     //
     var renderMiddleware = reacthelper(options).renderMiddleware;
+
+
+    if ( !isProd ) {
+		// 
+		// Generate the new configuration    	
+		// 	
+		var config = Reconfigure.generateConfig(options);
+		
+		
+	    //
+	    // ======= webpack middleware and hmr middleware ====
+	    //
+	    var compiler = webpack( config );
+	    var wp       = webpackDevMiddleware( compiler, {
+	        publicPath: config.output.publicPath , // public path where bundle and json is actually served
+	        stats: {
+	            colors: true,
+	        },
+	        noInfo: true,
+	        watchOptions:{
+	            poll: true
+	        }
+	    });
+	    var whmr             = webpackHotMiddleware(compiler);
+
+	
+	    stack = [ wp, whmr, renderMiddleware ];
+    }
     
     //
     // The public middleware
     //
 	var repackMiddleware = function repackMiddleware(req, res, next) {
-		var stack = [ wp, whmr, renderMiddleware];
-		var pos   = 0;
-
 		if ( isProd ) {
 			// we won't call webpack-middleware nor hot module replacement middleware in production,
 			// only the middleware that adds res.renderReact
 			return renderMiddleware(req, res, next);
 		}
 
+		var pos   = 0;
 		var theNext = function() {
 			if ( pos < stack.length ) {
 				stack[pos++](req, res, theNext);

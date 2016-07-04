@@ -2,6 +2,7 @@
 var _                    = require('lodash');
 var webpack              = require('webpack');
 var path                 = require('path');
+var reacthelper          = require('./reactHelper.js');
 
 /**
 *  This module creates a new configuration for webpack,
@@ -26,20 +27,14 @@ class Reconfigure {
 				path: "/",
 				publicPath: "/" // used to prefix json updates
 			},
-			resolve: {
-				//root: path.join(this.componentsPath, ".")
-			},
-			//context: path.join(this.componentsPath, ".."),
 			devtool: 'source-map',
 			plugins: [],
 			externals: {},
-			module: {
-			}/*,
-			resolveLoader: {
-				root: path.join(__dirname, "node_modules"),
-			}*/
+			module: {}
 		};
 
+		if ( this.isProd ) 
+			delete defaultConfig.devtool;
 
 		var original = _.cloneDeep ( this.webpackConfig );
 		return _.defaultsDeep( {}, original, defaultConfig );
@@ -75,12 +70,11 @@ class Reconfigure {
 
 	addReact( config, options ) {
 		options = options || {};
-		var hmr       = options.hmr       === undefined ? true  : options.hmr;
+		var config = _.cloneDeep ( config );
 		var externals = options.externals === undefined ? false : options.externals;
 		var react     = options.react     === undefined ? false : options.react;
 		var reactDom  = options.reactDom  === undefined ? false : options.reactDom;
 		var noparse   = options.noparse   === undefined ? false : options.noparse;
-		var config = _.cloneDeep ( config );
 
 		if ( externals ) {
 			config.externals['react-dom'] = 'ReactDOM';
@@ -99,17 +93,6 @@ class Reconfigure {
 			});
 		}
 
-		config.module.loaders = config.module.loaders || [];
-		config.module.loaders.push({
-			test: /\.jsx$/,
-			exclude: /node_modules/,
-			loader: 'babel',
-			query: {
-				presets: ['babel-preset-react', 'babel-preset-es2015'].map(require.resolve)
-			}
-		});
-		
-
 		if ( reactDom ) {
 			//var reactDomPath = require.resolve('react-dom/dist/react-dom.min.js');
 			var reactDomPath = require.resolve('react-dom/dist/react-dom.js');
@@ -121,13 +104,27 @@ class Reconfigure {
 			config = this.prependEntry( config, reactPath );
 		}
 			
-		if ( hmr ) {
-			var hmrPath = require.resolve('webpack-hot-middleware/client.js');
-			config = this.prependEntry ( config, hmrPath );
-		}
-
 		return config;
 
+	}
+
+	addLoaders ( config ) {
+		var config = _.cloneDeep ( config );
+
+		if ( typeof config.module != "object" ) config.module = {};
+		if ( !Array.isArray(config.module.loaders)) config.module.loaders = [];
+
+		config.module.loaders = config.module.loaders || [];
+		config.module.loaders.push({
+			test: /\.jsx$/,
+			exclude: /node_modules/,
+			loader: 'babel',
+			query: {
+				presets: ['babel-preset-react', 'babel-preset-es2015'].map(require.resolve)
+			}
+		});
+
+		return config;
 	}
 
 	addHmrMiddleware ( config ) {
@@ -137,20 +134,87 @@ class Reconfigure {
 			config.plugins = [];
 		}
 		
+		// add HMR plugin (server side)
 		config.plugins.unshift(
 			//new webpack.optimize.OccurenceOrderPlugin(),
 			new webpack.HotModuleReplacementPlugin(),
 			new webpack.NoErrorsPlugin()
-			/*,new webpack.optimize.UglifyJsPlugin({
-				compress: {
-					warnings: false
-				}
-			})*/
 		);
+
+		// add HRM entry point (client side)
+		var hmrPath = require.resolve('webpack-hot-middleware/client.js');
+		config = this.prependEntry ( config, hmrPath );
 
 		return config;
 	}
 
+	addUglify( config ) {
+		var config = _.cloneDeep( config );
+		
+		if ( !Array.isArray(config.plugins) ) {
+			config.plugins = [];
+		}
+
+		config.plugins.push(new webpack.optimize.UglifyJsPlugin({
+			compress: {
+				warnings: false
+			}
+		}));
+
+		config.plugins.push(new webpack.DefinePlugin({
+		    'process.env': {
+		      'NODE_ENV': JSON.stringify('production')
+		    }
+		}));
+
+		return config;
+
+	}
+
+}
+
+Reconfigure.generateConfig = function(options) {
+	var isProd            = options.productionMode ? options.productionMode : process.env.NODE_ENV == 'production';
+
+	// 
+	// Generate the new configuration    	
+	// 	
+	
+	var reconfigure = new Reconfigure( options );
+	var config      = reconfigure.addDefaultConfiguration();
+
+	if ( isProd ) {
+		config      = reconfigure.addUglify( config );
+	} else {
+		config      = reconfigure.addHmrMiddleware( config );
+	}
+
+	// adding babel loaders
+	config = reconfigure.addLoaders( config );
+	
+	// adding generated entry point 
+	if ( options.generateEntry ) {
+		var entryFile   = reacthelper(options).createEntryScript( options.componentsPath );
+		config          = reconfigure.prependEntry(config, entryFile);
+	}
+
+	//
+	// adding libraries
+	//
+	var defaultInternals = {
+		externals: false,
+		noparse: false,
+		react: false,
+		reactDom: false
+	};
+	var internalOptions = options.internals || defaultInternals;
+	config              = reconfigure.addReact ( config, internalOptions);
+
+	// debuging	
+	//console.log("webpack config:", config);
+	//console.log("loaders:", config.module.loaders[1].query.presets);
+
+	return config;
 }
 
 module.exports = Reconfigure;
