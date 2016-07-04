@@ -2,7 +2,7 @@
 var _                    = require('lodash');
 var webpack              = require('webpack');
 var path                 = require('path');
-var reacthelper          = require('./reactHelper.js');
+var fs                   = require('fs');
 
 /**
 *  This module creates a new configuration for webpack,
@@ -170,11 +170,69 @@ class Reconfigure {
 		return config;
 
 	}
+}
 
+Reconfigure.createEntryScript = function(options) {
+    var files = fs.readdirSync(options.componentsPath);
+    files = _(files)
+        .filter(val => val.endsWith(".jsx")                )
+        .filter(val => val.indexOf(".startup.jsx") == -1   )
+        .map(   val => val.substr(0, val.indexOf(".jsx"))  )
+        .value();
+    
+    var loadFiles = files.map(val => `import ${val} from './${val}.jsx';`).join("\n");
+    var listFiles = files.map(val => `'${val}': ${val}`).join(",");
+    
+    var content = `
+    // entry point script
+    import React from 'react';
+    import { render } from 'react-dom';
+    \n${loadFiles}
+    var compList = {${listFiles}}
+    var doRender = function() {
+        var INIT = window.INIT || {};
+        var props         = INIT.initialProps  || null;
+        var rootComponent = INIT.rootComponent || "MainComponent";
+        var targetEl      = document.getElementById("main");
+
+        console.log("rendering", rootComponent);
+        
+        if ( targetEl ) {
+            render(
+                React.createElement( compList[rootComponent], props),
+                targetEl
+            );
+        }
+    }
+
+    doRender();
+
+    if ( module.hot ) {
+        module.hot.accept(function() {
+            doRender();
+        });
+    }
+    // end entry point script`;
+
+
+
+    //console.log("entry file:", content);
+
+    
+    //var tempFile = temp.openSync({suffix: ".jsx"});
+    //fs.writeSync( tempFile.fd, content );
+    //return tempFile.path;
+
+    var tempFile = path.join(options.componentsPath, ".startup.jsx");
+    fs.writeFileSync( tempFile, content );
+    return tempFile;
 }
 
 Reconfigure.generateConfig = function(options) {
 	var isProd            = options.productionMode ? options.productionMode : process.env.NODE_ENV == 'production';
+	if( options.generateEntry === undefined ) {
+		options.generateEntry = true;
+	}
 
 	// 
 	// Generate the new configuration    	
@@ -194,7 +252,7 @@ Reconfigure.generateConfig = function(options) {
 	
 	// adding generated entry point 
 	if ( options.generateEntry ) {
-		var entryFile   = reacthelper(options).createEntryScript( options.componentsPath );
+		var entryFile   = Reconfigure.createEntryScript( options );
 		config          = reconfigure.prependEntry(config, entryFile);
 	}
 
