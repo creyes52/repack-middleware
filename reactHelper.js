@@ -9,11 +9,19 @@ temp.track();
 
 var Reconfigure          = require('./reconfigure.js');
 var components = {};
+var usingBabelRegister = false;
 
 module.exports = function(options) {
     var isProd         = options.isProd;
     var componentsPath = options.componentsPath;
 	var targetId       = options.elementId || "main";
+
+    if ( !usingBabelRegister && options.serverRender ) {
+        usingBabelRegister = true;
+        require('babel-register')({
+            presets: ['babel-preset-react', 'babel-preset-es2015'].map(require.resolve)
+        });
+    }
 
     var wrapHtml = function(html, vars, componentName) {
         var INIT = {
@@ -55,41 +63,37 @@ module.exports = function(options) {
     var renderFn = function(componentName, vars, req, cb) {
         var component = components[componentName];
 
-		return cb( null, wrapHtml("", vars, componentName));
-
         //
         //  Load the component, a component Type
         //
-        if ( component == undefined ) {
+        if ( options.serverRender && component == undefined ) {
             var compPath  = path.join(componentsPath, `${componentName}.jsx`);
             if ( !isProd ) {
                 // invalidate cache
                 delete require.cache[require.resolve(compPath)];
             }
-            var compObj   = require( compPath ).default;
+            var compObj   = require( compPath );
+            compObj       = compObj.default || compObj;
 
             //console.log(`loading component ${compPath} === ${compObj}`);
             if ( typeof compObj == 'function') {
                 // we are dealing with a component directly
                 component = React.createFactory( compObj );
-            } else {
-                component = compObj;
             }
-
-            if ( isProd ) {
-                components[componentName] = component; 
-            }
+            components[componentName] = component;
         }
         
         //console.log("component", component);
-        if ( typeof component == 'function') {
+        if ( options.serverRender && typeof component == 'function') {
             
             var element   = component(vars);
             var reactHtml = ReactDOMServer.renderToString( element );
             var html      = wrapHtml(reactHtml, vars, componentName);
             cb ( null, html );
         
-        }// if typeof component == 'function'
+        } else {
+            cb( null, wrapHtml("", vars, componentName));
+        }
 
     }
 

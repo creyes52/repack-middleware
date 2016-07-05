@@ -116,10 +116,17 @@ Configuration options are passed to the middleware when it is created.
 
 ```repackMiddleware ( options )```
 
- * **options.configFile** - The path to your webpack.config.js
- * **options.componentsPath** - Specifies the folder
- * **options.elementId** - What id to use for the inserted html (the target to ReactDOM.render )
- * **options.productionMode** - Do not load the webpack and hmr middleware, any bundles should have been previously bundled
+options
+
+|  option        | default    |            Description             |
+|------------    |------------|------------------------------------|
+| configFile     |required    | The path to your webpack.config.js |
+| componentsPath |required    | The root folder of your components |
+| productionMode | process.env.NODE_ENV == 'production'       | when true disables webpack middleware and hot module replacement, your app must serve a pregenerated bundle |
+| serverRender   | false      | enables server side rendering, currently relies on babel-require which is not suitable for production usage |
+| elementId      | "main"     | The id of the div that will be created containing server side rendered html if enabled or empty (the node on which the React root component will be mounted) |
+| generateEntry  | true       | generate a .startup.jsx that can initialize any component directly in the componentsPath folder |
+
 
 ### renderReact
 

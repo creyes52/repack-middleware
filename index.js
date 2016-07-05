@@ -8,12 +8,12 @@ var reacthelper          = require('./reactHelper.js');
 var Reconfigure          = require('./reconfigure.js');
 
 /**
-* options.configFile {String} - Path of the webpack.config.js file
-* options.componentsPath {String} - Path where to look for components
-* options.productionMode {Boolean} - true for production mode
-* options.serverRender {Boolean} - true to generate rendered html on the server, false will just insert the main element
-* options.elementId {String} - The id of the div that will be created containing server side rendered html if enabled or empty (the node on which the React root component will be mounted)
-* options.generateEntry {Boolean} - [false] whether or not to generate the entry point file
+* @param {String}  options.configFile                 - Path of the webpack.config.js file
+* @param {String}  options.componentsPath             - Path where to look for components
+* @param {Boolean} options.productionMode             - true for production mode
+* @param {Boolean} [options.serverRender=false]       - true for server side rendering, the target div is always generated. NOTE: Currently SSR is provided with babel-register, which is not suitable for production environment
+* @param {String}  [options.elementId   ="main"]      - The id of the div that will be created containing server side rendered html if enabled or empty (the node on which the React root component will be mounted)
+* @param {Boolean} [options.generateEntry = true]     - whether or not to generate the entry point file
 */
 module.exports = (function(options) {
     options               = options || {};
