@@ -60,28 +60,36 @@ module.exports = function(options) {
 	}
 
 
-    var renderFn = function(componentName, vars, req, cb) {
-        var component = components[componentName];
+    var renderFn = function(component, vars, req, cb) {
+        var componentName = component;
 
-        //
-        //  Load the component, a component Type
-        //
-        if ( options.serverRender && component == undefined ) {
-            var compPath  = path.join(componentsPath, `${componentName}.jsx`);
-            if ( !isProd ) {
-                // invalidate cache
-                delete require.cache[require.resolve(compPath)];
-            }
-            var compObj   = require( compPath );
-            compObj       = compObj.default || compObj;
+        if ( typeof component == 'string') {
+            component = components[componentName];
 
-            //console.log(`loading component ${compPath} === ${compObj}`);
-            if ( typeof compObj == 'function') {
-                // we are dealing with a component directly
-                component = React.createFactory( compObj );
+            //
+            //  Load the component, a component Type
+            //
+            if ( options.serverRender && component == undefined ) {
+                var compPath  = path.join(componentsPath, `${componentName}.jsx`);
+                if ( !isProd ) {
+                    // invalidate cache
+                    delete require.cache[require.resolve(compPath)];
+                }
+                var compObj   = require( compPath );
+                compObj       = compObj.default || compObj;
+
+                //console.log(`loading component ${compPath} === ${compObj}`);
+                if ( typeof compObj == 'function') {
+                    // we are dealing with a component directly
+                    component = React.createFactory( compObj );
+                }
+                components[componentName] = component;
             }
-            components[componentName] = component;
+        } else {
+            componentName = component.name || "MainComponent";
+            component = React.createFactory( component );
         }
+
         
         //console.log("component", component);
         if ( options.serverRender && typeof component == 'function') {

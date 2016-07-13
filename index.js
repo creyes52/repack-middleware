@@ -42,14 +42,13 @@ module.exports = (function(options) {
 	        stats: {
 	            colors: true,
 	        },
-	        noInfo: true,
+	        noInfo: true/*,
 	        watchOptions:{
 	            poll: true
-	        }
+	        }*/
 	    });
 	    var whmr             = webpackHotMiddleware(compiler);
 
-	
 	    stack = [ wp, whmr, renderMiddleware ];
     }
     
@@ -57,6 +56,7 @@ module.exports = (function(options) {
     // The public middleware
     //
 	var repackMiddleware = function repackMiddleware(req, res, next) {
+
 		if ( isProd ) {
 			// we won't call webpack-middleware nor hot module replacement middleware in production,
 			// only the middleware that adds res.renderReact
@@ -73,7 +73,6 @@ module.exports = (function(options) {
 		};
 		theNext();
 	}
-
 
 	return repackMiddleware;
 });
