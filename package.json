@@ -1,84 +1,23 @@
 {
-  "_args": [
-    [
-      {
-        "name": "repack-middleware",
-        "raw": "repack-middleware",
-        "rawSpec": "",
-        "scope": null,
-        "spec": "latest",
-        "type": "tag"
-      },
-      "Y:\\TrabajoXik\\shock"
-    ]
+  "name": "repack-middleware",
+  "version": "0.1.17",
+  "description": "Express-like middleware to webpack/hot module update modules",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon ./node_modules/mocha/bin/mocha"
+  },
+  "keywords": [
+    "react",
+    "webpack",
+    "sails"
   ],
-  "_from": "repack-middleware@latest",
-  "_id": "repack-middleware@0.1.16",
-  "_inCache": true,
-  "_installable": true,
-  "_location": "/repack-middleware",
-  "_nodeVersion": "4.4.6",
-  "_npmOperationalInternal": {
-    "host": "packages-12-west.internal.npmjs.com",
-    "tmp": "tmp/repack-middleware-0.1.16.tgz_1467745357358_0.6481370341498405"
+  "url": "https://github.com/creyes52/repack-middleware",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/creyes52/repack-middleware"
   },
-  "_npmUser": {
-    "email": "cesar.reyes52@gmail.com",
-    "name": "creyes52"
-  },
-  "_npmVersion": "2.15.5",
-  "_phantomChildren": {
-    "babel-code-frame": "6.11.0",
-    "babel-generator": "6.11.0",
-    "babel-helpers": "6.8.0",
-    "babel-messages": "6.8.0",
-    "babel-plugin-syntax-flow": "6.8.0",
-    "babel-plugin-syntax-jsx": "6.8.0",
-    "babel-plugin-transform-flow-strip-types": "6.8.0",
-    "babel-plugin-transform-react-display-name": "6.8.0",
-    "babel-plugin-transform-react-jsx": "6.8.0",
-    "babel-plugin-transform-react-jsx-self": "6.11.0",
-    "babel-plugin-transform-react-jsx-source": "6.9.0",
-    "babel-register": "6.9.0",
-    "babel-runtime": "6.9.2",
-    "babel-template": "6.9.0",
-    "babel-traverse": "6.10.4",
-    "babel-types": "6.11.1",
-    "babylon": "6.8.3",
-    "brace-expansion": "1.1.5",
-    "convert-source-map": "1.2.0",
-    "fbjs": "0.8.3",
-    "loose-envify": "1.2.0",
-    "ms": "0.7.1",
-    "object-assign": "4.1.0",
-    "path-exists": "1.0.0",
-    "path-is-absolute": "1.0.0",
-    "private": "0.1.6",
-    "shebang-regex": "1.0.0",
-    "slash": "1.0.0"
-  },
-  "_requested": {
-    "name": "repack-middleware",
-    "raw": "repack-middleware",
-    "rawSpec": "",
-    "scope": null,
-    "spec": "latest",
-    "type": "tag"
-  },
-  "_requiredBy": [
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/repack-middleware/-/repack-middleware-0.1.16.tgz",
-  "_shasum": "d134f5671f8281728e4b605ccd353ad20b9eab5e",
-  "_shrinkwrap": null,
-  "_spec": "repack-middleware",
-  "_where": "Y:\\TrabajoXik\\shock",
-  "author": {
-    "name": "creyes52"
-  },
-  "bugs": {
-    "url": "https://github.com/creyes52/repack-middleware/issues"
-  },
+  "author": "creyes52",
+  "license": "ISC",
   "dependencies": {
     "babel-core": "^6.10.4",
     "babel-loader": "^6.2.4",
@@ -93,41 +32,8 @@
     "webpack-dev-middleware": "^1.6.1",
     "webpack-hot-middleware": "^2.10.0"
   },
-  "description": "Express-like middleware to webpack/hot module update modules",
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^2.5.3"
-  },
-  "directories": {},
-  "dist": {
-    "shasum": "d134f5671f8281728e4b605ccd353ad20b9eab5e",
-    "tarball": "https://registry.npmjs.org/repack-middleware/-/repack-middleware-0.1.16.tgz"
-  },
-  "gitHead": "84efd39a561ee024ed34efa765cc13b39256d43e",
-  "homepage": "https://github.com/creyes52/repack-middleware#readme",
-  "keywords": [
-    "react",
-    "webpack",
-    "sails"
-  ],
-  "license": "ISC",
-  "main": "index.js",
-  "maintainers": [
-    {
-      "email": "cesar.reyes52@gmail.com",
-      "name": "creyes52"
-    }
-  ],
-  "name": "repack-middleware",
-  "optionalDependencies": {},
-  "readme": "ERROR: No README data found!",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/creyes52/repack-middleware.git"
-  },
-  "scripts": {
-    "test": "nodemon ./node_modules/mocha/bin/mocha"
-  },
-  "url": "https://github.com/creyes52/repack-middleware",
-  "version": "0.1.16"
+  }
 }

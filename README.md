@@ -1,6 +1,6 @@
 
 # Repack middleware
-Simply way to use React on your apps, with ES6 syntax, and JSX syntax, and hot module replacement. 
+Simply way to use React on your apps, with ES6 syntax, and JSX syntax, and hot module replacement, and server side rendering.
 
 
 ## Installation & usage
@@ -123,9 +123,12 @@ options
 | configFile     |required    | The path to your webpack.config.js |
 | componentsPath |required    | The root folder of your components |
 | productionMode | process.env.NODE_ENV == 'production'       | when true disables webpack middleware and hot module replacement, your app must serve a pregenerated bundle |
-| serverRender   | false      | enables server side rendering, currently relies on babel-require which is not suitable for production usage |
+| serverRender   | false      | enables server side rendering |
 | elementId      | "main"     | The id of the div that will be created containing server side rendered html if enabled or empty (the node on which the React root component will be mounted) |
 | generateEntry  | true       | generate a .startup.jsx that can initialize any component directly in the componentsPath folder |
+
+Note, if you enable server side rendering, and modify any of the jsx files, the server will continue to render the old component's html output, 
+due to node's require cache system.
 
 
 ### renderReact
