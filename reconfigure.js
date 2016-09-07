@@ -209,7 +209,8 @@ Reconfigure.createEntryScript = function(options) {
 
     if ( module.hot ) {
         module.hot.accept(function() {
-            doRender();
+            //doRender();
+			window.location.reload();
         });
     }
     // end entry point script`;
