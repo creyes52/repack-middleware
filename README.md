@@ -126,6 +126,7 @@ options
 | serverRender   | false      | enables server side rendering |
 | elementId      | "main"     | The id of the div that will be created containing server side rendered html if enabled or empty (the node on which the React root component will be mounted) |
 | generateEntry  | true       | generate a .startup.jsx that can initialize any component directly in the componentsPath folder |
+| fullReload     | false      | force the browser to reload on changes (util when using material-ui library for example)
 
 Note, if you enable server side rendering, and modify any of the jsx files, the server will continue to render the old component's html output, 
 due to node's require cache system.

@@ -3,7 +3,6 @@ var webpack              = require('webpack');
 var webpackDevMiddleware = require('webpack-dev-middleware');
 var webpackHotMiddleware = require('webpack-hot-middleware');
 var path                 = require('path');
-var helpers              = require('./helpers.js');
 var reacthelper          = require('./reactHelper.js');
 var Reconfigure          = require('./reconfigure.js');
 

@@ -182,6 +182,8 @@ Reconfigure.createEntryScript = function(options) {
     
     var loadFiles = files.map(val => `import ${val} from './${val}.jsx';`).join("\n");
     var listFiles = files.map(val => `'${val}': ${val}`).join(",");
+
+	var reloadLine = options.fullReload ? "window.location.reload()" : "doRender()";
     
     var content = `
     // entry point script
@@ -209,8 +211,7 @@ Reconfigure.createEntryScript = function(options) {
 
     if ( module.hot ) {
         module.hot.accept(function() {
-            //doRender();
-			window.location.reload();
+			${reloadLine}
         });
     }
     // end entry point script`;
@@ -268,10 +269,6 @@ Reconfigure.generateConfig = function(options) {
 	};
 	var internalOptions = options.internals || defaultInternals;
 	config              = reconfigure.addReact ( config, internalOptions);
-
-	// debuging	
-	//console.log("webpack config:", config);
-	//console.log("loaders:", config.module.loaders[1].query.presets);
 
 	return config;
 }
