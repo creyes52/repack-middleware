@@ -116,7 +116,7 @@ class Reconfigure {
 
 		config.module.loaders = config.module.loaders || [];
 		config.module.loaders.push({
-			test: /\.jsx$/,
+			test: /\.jsx?$/,
 			exclude: /node_modules/,
 			loader: 'babel',
 			query: {
