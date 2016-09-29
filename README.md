@@ -13,7 +13,7 @@ npm install repack-middleware
 ### Configuration files
 
 Create a webpack config file
-```
+```js
 module.exports = {
     output: {
         filename: "app.bundle.js",
@@ -25,7 +25,7 @@ module.exports = {
 
 Add the middleware to your app.
 
-```
+```js
 var repackMiddleware = require('repack-middleware');
 
 // ... include the middleware before other routes
@@ -39,7 +39,7 @@ app.use(repackMiddleware({
 
 Include the bundled script in your html.
 The middleware will generate the bundle in memory and serve it on the publicPath specified in the webpack.config.js 
-```
+```html
 <script type="text/javascript" src="/build/app.bundle.js"></script>
 ```
 
@@ -50,7 +50,7 @@ Create the main component:
 **./components/MainComponent.jsx**  
 This is the view that is being called form the route
 
-```
+```js
 import React from 'react';
 
 export default class MainComponent extends React.Component {
@@ -76,7 +76,7 @@ export default class MainComponent extends React.Component {
 Now, in your route, call res.renderReact() to generate the insert html where the the react component
 should be inserted.
 
-```
+```js
 /* GET home page. */
 router.get('/', function(req, res, next) {
 	var myProps = {
