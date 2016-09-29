@@ -1,5 +1,4 @@
 var assert  = require('chai').assert;
-var helpers = require('../helpers.js');
 var fs      = require('fs');
 var path        = require('path');
 var _       = require('lodash');
