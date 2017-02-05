@@ -121,11 +121,11 @@ class Reconfigure {
 			loader: 'babel',
 			query: {
 				plugins: _(['babel-plugin-transform-class-properties'])
-					.map(name => this.resolveModule)  
+					.map(name => this.resolveModule(name))
 					.filter()
 					.value(),
 				presets: _(['babel-preset-react', 'babel-preset-es2015'])
-					.map(name => this.resolveModule)  
+					.map(name => this.resolveModule(name))
 					.filter()
 					.value()
 			}
