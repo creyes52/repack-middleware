@@ -120,20 +120,26 @@ class Reconfigure {
 			exclude: /node_modules/,
 			loader: 'babel',
 			query: {
-				presets: _(['babel-preset-react', 'babel-preset-es2015', 'babel-plugin-transform-class-properties'])
-					.map(name => {
-						try {
-							return require.resolve(name)
-						} catch(err) {
-							return null
-						}
-					})  
+				plugins: _(['babel-plugin-transform-class-properties'])
+					.map(name => this.resolveModule)  
+					.filter()
+					.value(),
+				presets: _(['babel-preset-react', 'babel-preset-es2015'])
+					.map(name => this.resolveModule)  
 					.filter()
 					.value()
 			}
 		});
 
 		return config;
+	}
+
+	resolveModule(name) {
+		try {
+			return require.resolve(name)
+		} catch(err) {
+			return null
+		}
 	}
 
 	addHmrMiddleware ( config ) {
