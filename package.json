@@ -1,6 +1,6 @@
 {
   "name": "repack-middleware",
-  "version": "0.1.22",
+  "version": "0.1.23",
   "description": "Express-like middleware to webpack/hot module update modules",
   "main": "index.js",
   "scripts": {

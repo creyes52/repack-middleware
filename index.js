@@ -41,10 +41,7 @@ module.exports = (function(options) {
 	        stats: {
 	            colors: true,
 	        },
-	        noInfo: true/*,
-	        watchOptions:{
-	            poll: true
-	        }*/
+	        noInfo: true,
 	    });
 	    var whmr             = webpackHotMiddleware(compiler);
 
